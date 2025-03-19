@@ -17,25 +17,6 @@ public class TaskForm extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        Main = new javax.swing.JSplitPane();
-        taskOverviewPanel = new javax.swing.JPanel();
-        taskOverviewScroll = new javax.swing.JScrollPane();
-        taskOverviewTree = new javax.swing.JTree();
-        taskPanel = new javax.swing.JPanel();
-        descriptionScroll = new javax.swing.JScrollPane();
-        descriptionArea = new javax.swing.JTextArea();
-        expirationDateSpinner = new javax.swing.JSpinner();
-        descriptionLabel = new javax.swing.JLabel();
-        expirationDateLabel = new javax.swing.JLabel();
-        statusLabel = new javax.swing.JComboBox<>();
-        expirationDateCheckbox = new javax.swing.JCheckBox();
-        fileMenu = new javax.swing.JMenu();
-        editMenu = new javax.swing.JMenu();
-        viewMenu = new javax.swing.JMenu();
-        windowMenu = new javax.swing.JMenu();
-        windowMenuDarkModeCheckbox = new javax.swing.JCheckBoxMenuItem();
-        helpMenu = new javax.swing.JMenu();
-
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Lista de Tarefas");
         setFocusCycleRoot(false);
@@ -55,7 +36,7 @@ public class TaskForm extends javax.swing.JFrame {
         taskOverviewPanelLayout.setHorizontalGroup(
             taskOverviewPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(taskOverviewPanelLayout.createSequentialGroup()
-                .addComponent(taskOverviewScroll, javax.swing.GroupLayout.DEFAULT_SIZE, 173, Short.MAX_VALUE)
+                .addComponent(taskOverviewScroll, javax.swing.GroupLayout.DEFAULT_SIZE, 169, Short.MAX_VALUE)
                 .addGap(0, 0, 0))
         );
         taskOverviewPanelLayout.setVerticalGroup(
@@ -95,20 +76,18 @@ public class TaskForm extends javax.swing.JFrame {
         taskPanelLayout.setHorizontalGroup(
             taskPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, taskPanelLayout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(taskPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(expirationDateSpinner, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(expirationDateSpinner)
+                    .addComponent(descriptionScroll)
                     .addGroup(taskPanelLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(taskPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(taskPanelLayout.createSequentialGroup()
-                                .addComponent(descriptionLabel)
-                                .addGap(18, 18, 18)
-                                .addComponent(statusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 378, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(descriptionScroll)
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, taskPanelLayout.createSequentialGroup()
-                                .addComponent(expirationDateLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(expirationDateCheckbox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
+                        .addComponent(expirationDateLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 32, Short.MAX_VALUE)
+                        .addComponent(expirationDateCheckbox, javax.swing.GroupLayout.PREFERRED_SIZE, 380, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(taskPanelLayout.createSequentialGroup()
+                        .addComponent(descriptionLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(statusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 380, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         taskPanelLayout.setVerticalGroup(
@@ -158,7 +137,7 @@ public class TaskForm extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(Main)
+            .addComponent(Main, javax.swing.GroupLayout.DEFAULT_SIZE, 748, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -180,24 +159,24 @@ public class TaskForm extends javax.swing.JFrame {
     }//GEN-LAST:event_expirationDateCheckboxActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JSplitPane Main;
-    private javax.swing.JTextArea descriptionArea;
-    private javax.swing.JLabel descriptionLabel;
-    private javax.swing.JScrollPane descriptionScroll;
-    private javax.swing.JMenu editMenu;
-    private javax.swing.JCheckBox expirationDateCheckbox;
-    private javax.swing.JLabel expirationDateLabel;
-    private javax.swing.JSpinner expirationDateSpinner;
-    private javax.swing.JMenu fileMenu;
-    private javax.swing.JMenu helpMenu;
+    private final javax.swing.JSplitPane Main = new javax.swing.JSplitPane();
+    private final javax.swing.JTextArea descriptionArea = new javax.swing.JTextArea();
+    private final javax.swing.JLabel descriptionLabel = new javax.swing.JLabel();
+    private final javax.swing.JScrollPane descriptionScroll = new javax.swing.JScrollPane();
+    private final javax.swing.JMenu editMenu = new javax.swing.JMenu();
+    private final javax.swing.JCheckBox expirationDateCheckbox = new javax.swing.JCheckBox();
+    private final javax.swing.JLabel expirationDateLabel = new javax.swing.JLabel();
+    private final javax.swing.JSpinner expirationDateSpinner = new javax.swing.JSpinner();
+    private final javax.swing.JMenu fileMenu = new javax.swing.JMenu();
+    private final javax.swing.JMenu helpMenu = new javax.swing.JMenu();
     private final javax.swing.JMenuBar menuBar = new javax.swing.JMenuBar();
-    private javax.swing.JComboBox<String> statusLabel;
-    private javax.swing.JPanel taskOverviewPanel;
-    private javax.swing.JScrollPane taskOverviewScroll;
-    private javax.swing.JTree taskOverviewTree;
-    private javax.swing.JPanel taskPanel;
-    private javax.swing.JMenu viewMenu;
-    private javax.swing.JMenu windowMenu;
-    private javax.swing.JCheckBoxMenuItem windowMenuDarkModeCheckbox;
+    private final javax.swing.JComboBox<String> statusLabel = new javax.swing.JComboBox<>();
+    private final javax.swing.JPanel taskOverviewPanel = new javax.swing.JPanel();
+    private final javax.swing.JScrollPane taskOverviewScroll = new javax.swing.JScrollPane();
+    private final javax.swing.JTree taskOverviewTree = new javax.swing.JTree();
+    private final javax.swing.JPanel taskPanel = new javax.swing.JPanel();
+    private final javax.swing.JMenu viewMenu = new javax.swing.JMenu();
+    private final javax.swing.JMenu windowMenu = new javax.swing.JMenu();
+    private final javax.swing.JCheckBoxMenuItem windowMenuDarkModeCheckbox = new javax.swing.JCheckBoxMenuItem();
     // End of variables declaration//GEN-END:variables
 }
