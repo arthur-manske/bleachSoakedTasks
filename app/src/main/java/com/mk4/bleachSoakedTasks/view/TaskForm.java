@@ -1,7 +1,5 @@
 package com.mk4.bleachSoakedTasks.view;
 
-import java.awt.Color;
-
 /**
  * TaskForm implements the main view for the application
  * @author Arthur de Souza Manske
@@ -11,7 +9,8 @@ public class TaskForm extends javax.swing.JFrame {
     /**
      * Creates new form TaskForm
      */
-    public TaskForm() {
+    public TaskForm()
+    {
         initComponents();
     }
 
@@ -22,6 +21,7 @@ public class TaskForm extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Lista de Tarefas");
         setFocusCycleRoot(false);
+        setUndecorated(false);
 
         Main.setDividerSize(12);
         Main.setResizeWeight(0.005);
@@ -124,7 +124,6 @@ public class TaskForm extends javax.swing.JFrame {
         windowMenu.setText("Janela");
 
         windowMenuDarkModeCheckbox.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F2, 0));
-        windowMenuDarkModeCheckbox.setSelected(true);
         windowMenuDarkModeCheckbox.setText("Modo escuro");
         windowMenuDarkModeCheckbox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -144,7 +143,7 @@ public class TaskForm extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(Main, javax.swing.GroupLayout.DEFAULT_SIZE, 748, Short.MAX_VALUE)
+            .addComponent(Main)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
