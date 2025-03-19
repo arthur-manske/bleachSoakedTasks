@@ -15,7 +15,7 @@ public class App {
      */
     public static void main(String[] args)
     {
-        SwingConfig.setFlatLafTheme(true, null);
+        SwingConfig.setFlatLafTheme(false, null);        
         new TaskForm().setVisible(true);
     }
 }

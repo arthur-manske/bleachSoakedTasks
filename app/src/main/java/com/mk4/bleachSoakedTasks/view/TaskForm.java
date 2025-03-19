@@ -1,5 +1,7 @@
 package com.mk4.bleachSoakedTasks.view;
 
+import java.awt.Color;
+
 /**
  * TaskForm implements the main view for the application
  * @author Arthur de Souza Manske
@@ -124,6 +126,11 @@ public class TaskForm extends javax.swing.JFrame {
         windowMenuDarkModeCheckbox.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F2, 0));
         windowMenuDarkModeCheckbox.setSelected(true);
         windowMenuDarkModeCheckbox.setText("Modo escuro");
+        windowMenuDarkModeCheckbox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                windowMenuDarkModeCheckboxActionPerformed(evt);
+            }
+        });
         windowMenu.add(windowMenuDarkModeCheckbox);
 
         menuBar.add(windowMenu);
@@ -157,6 +164,16 @@ public class TaskForm extends javax.swing.JFrame {
     private void expirationDateCheckboxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_expirationDateCheckboxActionPerformed
         this.expirationDateSpinner.setEnabled(this.expirationDateCheckbox.isSelected());
     }//GEN-LAST:event_expirationDateCheckboxActionPerformed
+
+    private void windowMenuDarkModeCheckboxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_windowMenuDarkModeCheckboxActionPerformed
+        final var error = SwingConfig.setFlatLafTheme(this.windowMenuDarkModeCheckbox.isSelected(), null);
+        if (error != null) {
+            javax.swing.JOptionPane.showMessageDialog(null, "Não foi possível definir o tema: " + error, "Erro", javax.swing.JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        javax.swing.SwingUtilities.updateComponentTreeUI(this);
+    }//GEN-LAST:event_windowMenuDarkModeCheckboxActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private final javax.swing.JSplitPane Main = new javax.swing.JSplitPane();
