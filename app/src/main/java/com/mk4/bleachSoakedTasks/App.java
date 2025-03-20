@@ -9,15 +9,30 @@ import com.mk4.bleachSoakedTasks.view.TaskForm;
  * @author Arthur de Souza Manske
  */
 public class App {
+    private WindowPreferencesController winPrefsController;
+    private TaskForm                    taskForm;
+
+    private App()
+    {
+        this.winPrefsController = new WindowPreferencesController(this.getClass().getName());
+
+        this.winPrefsController.apply(null);
+        this.taskForm = new TaskForm(this.winPrefsController);
+    }
+
+    private void run()
+    {
+        this.winPrefsController.apply(this.taskForm);
+        this.taskForm.setVisible(true);
+    }
+
     /**
      * Initializes the application
      * @param args - Command line arguments
      */
     public static void main(String[] args)
     {
-    	final var app = new App();
-	final var winPrefsController = new WindowPreferencesController(app.getClass().getName());
-	
-	new TaskForm(winPrefsController).setVisible(true);
+        final var app = new App();
+        app.run();
     }
 }
