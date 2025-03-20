@@ -1,16 +1,22 @@
 package com.mk4.bleachSoakedTasks.view;
 
+import com.mk4.bleachSoakedTasks.controller.WindowPreferencesController;
+import javax.swing.JOptionPane;
+
 /**
  * TaskForm implements the main view for the application
  * @author Arthur de Souza Manske
  */
 public class TaskForm extends javax.swing.JFrame {
-
+    private WindowPreferencesController windowPrefs;
+    
     /**
      * Creates new form TaskForm
      */
-    public TaskForm()
+    public TaskForm(WindowPreferencesController windowPrefs)
     {
+        this.windowPrefs = windowPrefs;
+        
         initComponents();
     }
 
@@ -18,19 +24,68 @@ public class TaskForm extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        taskOverviewTreeContextMenu = new javax.swing.JPopupMenu();
+        taskOverviewTreeCreateMenu = new javax.swing.JMenu();
+        taskOverviewTreeCreateGroup = new javax.swing.JMenuItem();
+        taskOverviewTreeCreateTask = new javax.swing.JMenuItem();
+        taskOverviewTreeDelete = new javax.swing.JMenuItem();
+
+        taskOverviewTreeContextMenu.setInvoker(taskOverviewTree);
+        taskOverviewTreeContextMenu.setPopupSize(new java.awt.Dimension(120, 50));
+
+        taskOverviewTreeCreateMenu.setText("Criar");
+        taskOverviewTreeCreateMenu.setToolTipText("Menu de criação");
+
+        taskOverviewTreeCreateGroup.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_G, java.awt.event.InputEvent.CTRL_DOWN_MASK));
+        taskOverviewTreeCreateGroup.setText("Criar novo grupo de tarefas");
+        taskOverviewTreeCreateGroup.setToolTipText("Divide e organiza as tarefas (Ctrl+G)");
+        taskOverviewTreeCreateGroup.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                taskOverviewTreeCreateGroupActionPerformed(evt);
+            }
+        });
+        taskOverviewTreeCreateMenu.add(taskOverviewTreeCreateGroup);
+
+        taskOverviewTreeCreateTask.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_N, java.awt.event.InputEvent.CTRL_DOWN_MASK));
+        taskOverviewTreeCreateTask.setText("Criar tarefa");
+        taskOverviewTreeCreateTask.setToolTipText("Nova tarefa dentro do grupo atual (Ctrl+N)");
+        taskOverviewTreeCreateTask.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                taskOverviewTreeCreateTaskActionPerformed(evt);
+            }
+        });
+        taskOverviewTreeCreateMenu.add(taskOverviewTreeCreateTask);
+
+        taskOverviewTreeContextMenu.add(taskOverviewTreeCreateMenu);
+
+        taskOverviewTreeDelete.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_DELETE, 0));
+        taskOverviewTreeDelete.setText("Deletar");
+        taskOverviewTreeDelete.setToolTipText("Deleta a seleção atual (Delete)");
+        taskOverviewTreeDelete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                taskOverviewTreeDeleteActionPerformed(evt);
+            }
+        });
+        taskOverviewTreeContextMenu.add(taskOverviewTreeDelete);
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Lista de Tarefas");
         setFocusCycleRoot(false);
-        setUndecorated(false);
 
         Main.setDividerSize(12);
         Main.setResizeWeight(0.005);
         Main.setToolTipText("");
 
         taskOverviewTree.setFont(new java.awt.Font("Franklin Gothic Book", 0, 12)); // NOI18N
-        taskOverviewTree.setAutoscrolls(true);
+        taskOverviewTree.setComponentPopupMenu(taskOverviewTreeContextMenu);
         taskOverviewTree.setDragEnabled(true);
+        taskOverviewTree.setDropMode(javax.swing.DropMode.ON_OR_INSERT);
         taskOverviewTree.setEditable(true);
+        taskOverviewTree.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                taskOverviewTreeKeyPressed(evt);
+            }
+        });
         taskOverviewScroll.setViewportView(taskOverviewTree);
 
         javax.swing.GroupLayout taskOverviewPanelLayout = new javax.swing.GroupLayout(taskOverviewPanel);
@@ -124,6 +179,7 @@ public class TaskForm extends javax.swing.JFrame {
         windowMenu.setText("Janela");
 
         windowMenuDarkModeCheckbox.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F2, 0));
+        windowMenuDarkModeCheckbox.setSelected(this.windowPrefs.getTheme().equals("dark"));
         windowMenuDarkModeCheckbox.setText("Modo escuro");
         windowMenuDarkModeCheckbox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -165,14 +221,94 @@ public class TaskForm extends javax.swing.JFrame {
     }//GEN-LAST:event_expirationDateCheckboxActionPerformed
 
     private void windowMenuDarkModeCheckboxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_windowMenuDarkModeCheckboxActionPerformed
-        final var error = SwingConfig.setFlatLafTheme(this.windowMenuDarkModeCheckbox.isSelected(), null);
-        if (error != null) {
-            javax.swing.JOptionPane.showMessageDialog(null, "Não foi possível definir o tema: " + error, "Erro", javax.swing.JOptionPane.ERROR_MESSAGE);
-            return;
+        if (this.windowMenuDarkModeCheckbox.isSelected()) {
+            this.windowPrefs.setTheme("dark");
+        } else {
+            this.windowPrefs.setTheme("light");
         }
         
-        javax.swing.SwingUtilities.updateComponentTreeUI(this);
+        final var error = this.windowPrefs.apply(this);        
+        if (error != null)
+            javax.swing.JOptionPane.showMessageDialog(null, "Não foi possível definir o tema: " + error, "Erro", javax.swing.JOptionPane.ERROR_MESSAGE);
     }//GEN-LAST:event_windowMenuDarkModeCheckboxActionPerformed
+
+    private void taskOverviewTreeCreateTaskActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_taskOverviewTreeCreateTaskActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_taskOverviewTreeCreateTaskActionPerformed
+
+    private void taskOverviewTreeDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_taskOverviewTreeDeleteActionPerformed
+       var model = (javax.swing.tree.DefaultTreeModel) this.taskOverviewTree.getModel();
+        var selectedNode = (javax.swing.tree.DefaultMutableTreeNode) this.taskOverviewTree.getLastSelectedPathComponent();
+
+        if (selectedNode == null) {
+            JOptionPane.showMessageDialog(this, "Por favor, selecione um item para excluir.", "Aviso", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        int confirm = JOptionPane.showConfirmDialog(
+            this,
+            "Tem certeza que deseja excluir o item selecionado?",
+            "Confirmação",
+            JOptionPane.YES_NO_OPTION
+        );
+
+        if (confirm == JOptionPane.YES_OPTION)
+            model.removeNodeFromParent(selectedNode);
+    }//GEN-LAST:event_taskOverviewTreeDeleteActionPerformed
+
+    private void taskOverviewTreeKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_taskOverviewTreeKeyPressed
+        if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_DELETE) {
+            this.taskOverviewTreeDeleteActionPerformed(null);
+            return;
+        }
+    }//GEN-LAST:event_taskOverviewTreeKeyPressed
+
+    private void taskOverviewTreeCreateGroupActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_taskOverviewTreeCreateGroupActionPerformed
+    if (this.taskOverviewTree.isEditing()) return;
+    
+    final var model = (javax.swing.tree.DefaultTreeModel) this.taskOverviewTree.getModel();
+    final var rootNode = (javax.swing.tree.DefaultMutableTreeNode) model.getRoot();
+    final var selectedNode = (javax.swing.tree.DefaultMutableTreeNode) this.taskOverviewTree.getLastSelectedPathComponent();
+    final var parentNode = (selectedNode != null) ? selectedNode : rootNode;
+    
+    final var newGroupNode = new javax.swing.tree.DefaultMutableTreeNode("Novo Grupo");
+    model.insertNodeInto(newGroupNode, parentNode, parentNode.getChildCount());
+
+    this.taskOverviewTree.scrollPathToVisible(new javax.swing.tree.TreePath(model.getPathToRoot(newGroupNode)));
+    this.taskOverviewTree.startEditingAtPath(new javax.swing.tree.TreePath(newGroupNode.getPath()));
+
+    this.taskOverviewTree.getCellEditor().addCellEditorListener(new javax.swing.event.CellEditorListener() {
+        @Override
+        public void editingStopped(javax.swing.event.ChangeEvent e) {
+            if (newGroupNode == null) return;
+            final var newName = newGroupNode.getUserObject().toString().trim();
+
+            if (newName.isEmpty()) {
+                final var parent = (javax.swing.tree.DefaultMutableTreeNode) newGroupNode.getParent();
+                final var index  = parent != null ? parent.getIndex(newGroupNode) : -1;
+                
+                if (index > 0) {
+                    final var prev = (javax.swing.tree.DefaultMutableTreeNode) parent.getChildAt(index - 1);
+                    final var path = new javax.swing.tree.TreePath(prev.getPath());
+                    
+                    model.removeNodeFromParent(newGroupNode);
+                    
+                    javax.swing.SwingUtilities.invokeLater(() -> {
+                        taskOverviewTree.setSelectionPath(path);
+                    });
+                }
+            } else {
+                model.nodeChanged(newGroupNode);
+            }
+        }
+
+        @Override
+        public void editingCanceled(javax.swing.event.ChangeEvent e) {
+            // Remove o nó caso a edição seja cancelada
+            // model.removeNodeFromParent(newGroupNode);
+        }
+    });
+    }//GEN-LAST:event_taskOverviewTreeCreateGroupActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private final javax.swing.JSplitPane Main = new javax.swing.JSplitPane();
@@ -190,6 +326,11 @@ public class TaskForm extends javax.swing.JFrame {
     private final javax.swing.JPanel taskOverviewPanel = new javax.swing.JPanel();
     private final javax.swing.JScrollPane taskOverviewScroll = new javax.swing.JScrollPane();
     private final javax.swing.JTree taskOverviewTree = new javax.swing.JTree();
+    private javax.swing.JPopupMenu taskOverviewTreeContextMenu;
+    private javax.swing.JMenuItem taskOverviewTreeCreateGroup;
+    private javax.swing.JMenu taskOverviewTreeCreateMenu;
+    private javax.swing.JMenuItem taskOverviewTreeCreateTask;
+    private javax.swing.JMenuItem taskOverviewTreeDelete;
     private final javax.swing.JPanel taskPanel = new javax.swing.JPanel();
     private final javax.swing.JMenu viewMenu = new javax.swing.JMenu();
     private final javax.swing.JMenu windowMenu = new javax.swing.JMenu();
