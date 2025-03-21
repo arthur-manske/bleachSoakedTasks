@@ -8,10 +8,11 @@ import javax.swing.JOptionPane;
  * @author Arthur de Souza Manske
  */
 public class TaskForm extends javax.swing.JFrame {
-    private WindowPreferencesController windowPrefs;
+    private final WindowPreferencesController windowPrefs;
     
     /**
      * Creates new form TaskForm
+     * @param windowPrefs The controller for window preferences
      */
     public TaskForm(WindowPreferencesController windowPrefs)
     {
