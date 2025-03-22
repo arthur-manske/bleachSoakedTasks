@@ -44,11 +44,12 @@ public class DatabaseContainer implements AutoCloseable {
     public String initialize()
     {
         final var sql = """
-        CREATE TABLE IF NOT EXISTS books (
+        CREATE TABLE IF NOT EXISTS tasks (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT NOT NULL UNIQUE,
-            author TEXT NOT NULL,
-            releaseDate DATE NOT NULL
+            description TEXT,
+            expirationDate DATE,
+            status INT
         );""";
         
         if (this.initialized) return null;
@@ -56,13 +57,13 @@ public class DatabaseContainer implements AutoCloseable {
         try {
            this.sqlConn = DriverManager.getConnection(path); 
         } catch (SQLException e) {
-           return "ERR:DatabaseContainer::initialize(): " + e.getLocalizedMessage();
+           return e.getLocalizedMessage();
         }
                 
         try (var statement = this.sqlConn.createStatement()) {
             statement.execute(sql);
         } catch (SQLException e) {            
-            return "ERR:DatabaseContainer::initialize(): " + e.getLocalizedMessage();
+            return e.getLocalizedMessage();
         }
         
         this.initialized = true;
