@@ -234,12 +234,55 @@ public class TaskForm extends javax.swing.JFrame {
     }//GEN-LAST:event_windowMenuDarkModeCheckboxActionPerformed
 
     private void taskOverviewTreeCreateTaskActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_taskOverviewTreeCreateTaskActionPerformed
-        // TODO add your handling code here:
+        if (this.taskOverviewTree.isEditing()) return;
+    
+        if (this.taskOverviewTree.isEditing()) return;
+    
+        final var model        = (javax.swing.tree.DefaultTreeModel) this.taskOverviewTree.getModel();
+        final var rootNode     = (javax.swing.tree.DefaultMutableTreeNode) model.getRoot();
+        final var selectedNode = (javax.swing.tree.DefaultMutableTreeNode) this.taskOverviewTree.getLastSelectedPathComponent();
+        final var newNode       = new javax.swing.tree.DefaultMutableTreeNode("Nova tarefa", false);
+
+        var parentNode = (selectedNode != null) ? selectedNode : rootNode;
+        if (!parentNode.getAllowsChildren()) parentNode = rootNode;
+    
+        model.insertNodeInto(newNode, parentNode, parentNode.getChildCount());
+        
+        this.taskOverviewTree.scrollPathToVisible(new javax.swing.tree.TreePath(model.getPathToRoot(newNode)));
+        this.taskOverviewTree.startEditingAtPath(new javax.swing.tree.TreePath(newNode.getPath()));
+
+        this.taskOverviewTree.getCellEditor().addCellEditorListener(new javax.swing.event.CellEditorListener() {
+            @Override
+            public void editingStopped(javax.swing.event.ChangeEvent e) {
+                if (newNode == null) return;
+                final var newName = newNode.getUserObject().toString().trim();
+
+                if (newName.isEmpty()) {
+                    final var parent = (javax.swing.tree.DefaultMutableTreeNode) newNode.getParent();
+                    final var index  = parent != null ? parent.getIndex(newNode) : -1;
+                
+                    if (index > 0) {
+                        final var prev = (javax.swing.tree.DefaultMutableTreeNode) parent.getChildAt(index - 1);
+                        final var path = new javax.swing.tree.TreePath(prev.getPath());
+                    
+                        model.removeNodeFromParent(newNode);
+                    
+                        javax.swing.SwingUtilities.invokeLater(() -> {
+                            taskOverviewTree.setSelectionPath(path);
+                        });
+                    }
+                } else {
+                    model.nodeChanged(newNode);
+                }
+            }
+            
+            @Override public void editingCanceled(javax.swing.event.ChangeEvent e) {}
+        });
     }//GEN-LAST:event_taskOverviewTreeCreateTaskActionPerformed
 
     private void taskOverviewTreeDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_taskOverviewTreeDeleteActionPerformed
-       var model = (javax.swing.tree.DefaultTreeModel) this.taskOverviewTree.getModel();
-        var selectedNode = (javax.swing.tree.DefaultMutableTreeNode) this.taskOverviewTree.getLastSelectedPathComponent();
+        final var model        = (javax.swing.tree.DefaultTreeModel) this.taskOverviewTree.getModel();
+        final var selectedNode = (javax.swing.tree.DefaultMutableTreeNode) this.taskOverviewTree.getLastSelectedPathComponent();
 
         if (selectedNode == null) {
             JOptionPane.showMessageDialog(this, "Por favor, selecione um item para excluir.", "Aviso", JOptionPane.WARNING_MESSAGE);
@@ -265,50 +308,48 @@ public class TaskForm extends javax.swing.JFrame {
     }//GEN-LAST:event_taskOverviewTreeKeyPressed
 
     private void taskOverviewTreeCreateGroupActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_taskOverviewTreeCreateGroupActionPerformed
-    if (this.taskOverviewTree.isEditing()) return;
+        if (this.taskOverviewTree.isEditing()) return;
     
-    final var model = (javax.swing.tree.DefaultTreeModel) this.taskOverviewTree.getModel();
-    final var rootNode = (javax.swing.tree.DefaultMutableTreeNode) model.getRoot();
-    final var selectedNode = (javax.swing.tree.DefaultMutableTreeNode) this.taskOverviewTree.getLastSelectedPathComponent();
-    final var parentNode = (selectedNode != null) ? selectedNode : rootNode;
-    
-    final var newGroupNode = new javax.swing.tree.DefaultMutableTreeNode("Novo Grupo");
-    model.insertNodeInto(newGroupNode, parentNode, parentNode.getChildCount());
+        final var model        = (javax.swing.tree.DefaultTreeModel) this.taskOverviewTree.getModel();
+        final var rootNode     = (javax.swing.tree.DefaultMutableTreeNode) model.getRoot();
+        final var selectedNode = (javax.swing.tree.DefaultMutableTreeNode) this.taskOverviewTree.getLastSelectedPathComponent();
+        final var newGroupNode = new javax.swing.tree.DefaultMutableTreeNode("Novo Grupo");
+        
+        var parentNode = (selectedNode != null) ? selectedNode : rootNode;
+        if (!parentNode.getAllowsChildren()) parentNode = rootNode;
+        
+        model.insertNodeInto(newGroupNode, parentNode, parentNode.getChildCount());
 
-    this.taskOverviewTree.scrollPathToVisible(new javax.swing.tree.TreePath(model.getPathToRoot(newGroupNode)));
-    this.taskOverviewTree.startEditingAtPath(new javax.swing.tree.TreePath(newGroupNode.getPath()));
+        this.taskOverviewTree.scrollPathToVisible(new javax.swing.tree.TreePath(model.getPathToRoot(newGroupNode)));
+        this.taskOverviewTree.startEditingAtPath(new javax.swing.tree.TreePath(newGroupNode.getPath()));
 
-    this.taskOverviewTree.getCellEditor().addCellEditorListener(new javax.swing.event.CellEditorListener() {
-        @Override
-        public void editingStopped(javax.swing.event.ChangeEvent e) {
-            if (newGroupNode == null) return;
-            final var newName = newGroupNode.getUserObject().toString().trim();
+        this.taskOverviewTree.getCellEditor().addCellEditorListener(new javax.swing.event.CellEditorListener() {
+            @Override
+            public void editingStopped(javax.swing.event.ChangeEvent e) {
+                if (newGroupNode == null) return;
+                final var newName = newGroupNode.getUserObject().toString().trim();
 
-            if (newName.isEmpty()) {
-                final var parent = (javax.swing.tree.DefaultMutableTreeNode) newGroupNode.getParent();
-                final var index  = parent != null ? parent.getIndex(newGroupNode) : -1;
+                if (newName.isEmpty()) {
+                    final var parent = (javax.swing.tree.DefaultMutableTreeNode) newGroupNode.getParent();
+                    final var index  = parent != null ? parent.getIndex(newGroupNode) : -1;
                 
-                if (index > 0) {
-                    final var prev = (javax.swing.tree.DefaultMutableTreeNode) parent.getChildAt(index - 1);
-                    final var path = new javax.swing.tree.TreePath(prev.getPath());
+                    if (index > 0) {
+                        final var prev = (javax.swing.tree.DefaultMutableTreeNode) parent.getChildAt(index - 1);
+                        final var path = new javax.swing.tree.TreePath(prev.getPath());
                     
-                    model.removeNodeFromParent(newGroupNode);
+                        model.removeNodeFromParent(newGroupNode);
                     
-                    javax.swing.SwingUtilities.invokeLater(() -> {
-                        taskOverviewTree.setSelectionPath(path);
-                    });
+                        javax.swing.SwingUtilities.invokeLater(() -> {
+                            taskOverviewTree.setSelectionPath(path);
+                        });
+                    }
+                } else {
+                    model.nodeChanged(newGroupNode);
                 }
-            } else {
-                model.nodeChanged(newGroupNode);
             }
-        }
-
-        @Override
-        public void editingCanceled(javax.swing.event.ChangeEvent e) {
-            // Remove o nó caso a edição seja cancelada
-            // model.removeNodeFromParent(newGroupNode);
-        }
-    });
+            
+            @Override public void editingCanceled(javax.swing.event.ChangeEvent e) {}
+        });
     }//GEN-LAST:event_taskOverviewTreeCreateGroupActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
