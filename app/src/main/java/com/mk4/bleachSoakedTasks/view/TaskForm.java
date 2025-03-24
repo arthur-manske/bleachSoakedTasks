@@ -1,24 +1,61 @@
 package com.mk4.bleachSoakedTasks.view;
 
+import com.mk4.bleachSoakedTasks.controller.TaskController;
 import com.mk4.bleachSoakedTasks.controller.WindowPreferencesController;
+
+import java.util.ArrayList;
 import javax.swing.JOptionPane;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 
 /**
  * TaskForm implements the main view for the application
+ *
  * @author Arthur de Souza Manske
  */
 public class TaskForm extends javax.swing.JFrame {
+
+    private final TaskController tasks;
     private final WindowPreferencesController windowPrefs;
-    
+
     /**
      * Creates new form TaskForm
+     *
+     * @param tasks The controller for the tasks
      * @param windowPrefs The controller for window preferences
      */
-    public TaskForm(WindowPreferencesController windowPrefs)
-    {
+    public TaskForm(TaskController tasks, WindowPreferencesController windowPrefs) {
+        this.tasks = tasks;
         this.windowPrefs = windowPrefs;
-        
+
         initComponents();
+
+        this.updateTree();
+    }
+
+    private void updateTree() {
+        final var model = (DefaultTreeModel) this.taskOverviewTree.getModel();
+        final var root = (DefaultMutableTreeNode) (model != null ? model.getRoot() : null);
+
+        if (model == null || root == null) {
+            return;
+        }
+
+        final var contents = new ArrayList<String>();
+        if (!this.tasks.listTasks(contents)) {
+            JOptionPane.showMessageDialog(null, "Erro no banco de dados: " + this.tasks.getError(), "Erro", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        root.removeAllChildren();
+        for (final var content : contents) {
+            final var newNode = new DefaultMutableTreeNode(content, false);
+            final var pos = this.tasks.getTaskPos(content);
+
+            model.insertNodeInto(newNode, root, pos >= 0 ? pos : root.getChildCount());
+        }
+
+        model.reload();
     }
 
     @SuppressWarnings("unchecked")
@@ -78,10 +115,23 @@ public class TaskForm extends javax.swing.JFrame {
         Main.setToolTipText("");
 
         taskOverviewTree.setFont(new java.awt.Font("Franklin Gothic Book", 0, 12)); // NOI18N
+        javax.swing.tree.DefaultMutableTreeNode treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("Notas");
+        taskOverviewTree.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
+        taskOverviewTree.setToolTipText("");
         taskOverviewTree.setComponentPopupMenu(taskOverviewTreeContextMenu);
         taskOverviewTree.setDragEnabled(true);
-        taskOverviewTree.setDropMode(javax.swing.DropMode.ON_OR_INSERT);
         taskOverviewTree.setEditable(true);
+        taskOverviewTree.setRootVisible(false);
+        taskOverviewTree.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
+            public void valueChanged(javax.swing.event.TreeSelectionEvent evt) {
+                taskOverviewTreeValueChanged(evt);
+            }
+        });
+        taskOverviewTree.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                taskOverviewTreePropertyChange(evt);
+            }
+        });
         taskOverviewTree.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 taskOverviewTreeKeyPressed(evt);
@@ -227,61 +277,39 @@ public class TaskForm extends javax.swing.JFrame {
         } else {
             this.windowPrefs.setTheme("light");
         }
-        
-        final var error = this.windowPrefs.apply(this);        
+
+        final var error = this.windowPrefs.apply(this);
         if (error != null)
             javax.swing.JOptionPane.showMessageDialog(null, "Não foi possível definir o tema: " + error, "Erro", javax.swing.JOptionPane.ERROR_MESSAGE);
     }//GEN-LAST:event_windowMenuDarkModeCheckboxActionPerformed
 
     private void taskOverviewTreeCreateTaskActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_taskOverviewTreeCreateTaskActionPerformed
-        if (this.taskOverviewTree.isEditing()) return;
-    
-        if (this.taskOverviewTree.isEditing()) return;
-    
-        final var model        = (javax.swing.tree.DefaultTreeModel) this.taskOverviewTree.getModel();
-        final var rootNode     = (javax.swing.tree.DefaultMutableTreeNode) model.getRoot();
+        if (this.taskOverviewTree.isEditing()) {
+            return;
+        }
+
+        final var model = (javax.swing.tree.DefaultTreeModel) this.taskOverviewTree.getModel();
+        final var rootNode = (javax.swing.tree.DefaultMutableTreeNode) model.getRoot();
         final var selectedNode = (javax.swing.tree.DefaultMutableTreeNode) this.taskOverviewTree.getLastSelectedPathComponent();
-        final var newNode       = new javax.swing.tree.DefaultMutableTreeNode("Nova tarefa", false);
+        final var newNode = new javax.swing.tree.DefaultMutableTreeNode("Nova tarefa", false);
 
         var parentNode = (selectedNode != null) ? selectedNode : rootNode;
-        if (!parentNode.getAllowsChildren()) parentNode = rootNode;
-    
+        if (!parentNode.getAllowsChildren()) {
+            parentNode = rootNode;
+        }
+
+        if (!this.tasks.addTask("Nova tarefa", null, null, parentNode.getChildCount(), 0)) {
+            JOptionPane.showMessageDialog(null, "ERRO: " + this.tasks.getError());
+            return;
+        }
+
         model.insertNodeInto(newNode, parentNode, parentNode.getChildCount());
-        
         this.taskOverviewTree.scrollPathToVisible(new javax.swing.tree.TreePath(model.getPathToRoot(newNode)));
         this.taskOverviewTree.startEditingAtPath(new javax.swing.tree.TreePath(newNode.getPath()));
-
-        this.taskOverviewTree.getCellEditor().addCellEditorListener(new javax.swing.event.CellEditorListener() {
-            @Override
-            public void editingStopped(javax.swing.event.ChangeEvent e) {
-                if (newNode == null) return;
-                final var newName = newNode.getUserObject().toString().trim();
-
-                if (newName.isEmpty()) {
-                    final var parent = (javax.swing.tree.DefaultMutableTreeNode) newNode.getParent();
-                    final var index  = parent != null ? parent.getIndex(newNode) : -1;
-                
-                    if (index > 0) {
-                        final var prev = (javax.swing.tree.DefaultMutableTreeNode) parent.getChildAt(index - 1);
-                        final var path = new javax.swing.tree.TreePath(prev.getPath());
-                    
-                        model.removeNodeFromParent(newNode);
-                    
-                        javax.swing.SwingUtilities.invokeLater(() -> {
-                            taskOverviewTree.setSelectionPath(path);
-                        });
-                    }
-                } else {
-                    model.nodeChanged(newNode);
-                }
-            }
-            
-            @Override public void editingCanceled(javax.swing.event.ChangeEvent e) {}
-        });
     }//GEN-LAST:event_taskOverviewTreeCreateTaskActionPerformed
 
     private void taskOverviewTreeDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_taskOverviewTreeDeleteActionPerformed
-        final var model        = (javax.swing.tree.DefaultTreeModel) this.taskOverviewTree.getModel();
+        final var model = (javax.swing.tree.DefaultTreeModel) this.taskOverviewTree.getModel();
         final var selectedNode = (javax.swing.tree.DefaultMutableTreeNode) this.taskOverviewTree.getLastSelectedPathComponent();
 
         if (selectedNode == null) {
@@ -290,14 +318,16 @@ public class TaskForm extends javax.swing.JFrame {
         }
 
         int confirm = JOptionPane.showConfirmDialog(
-            this,
-            "Tem certeza que deseja excluir o item selecionado?",
-            "Confirmação",
-            JOptionPane.YES_NO_OPTION
+                this,
+                "Tem certeza que deseja excluir o item selecionado?",
+                "Confirmação",
+                JOptionPane.YES_NO_OPTION
         );
 
-        if (confirm == JOptionPane.YES_OPTION)
+        if (confirm == JOptionPane.YES_OPTION) {
+            this.tasks.delTask((String) selectedNode.getUserObject());
             model.removeNodeFromParent(selectedNode);
+        }
     }//GEN-LAST:event_taskOverviewTreeDeleteActionPerformed
 
     private void taskOverviewTreeKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_taskOverviewTreeKeyPressed
@@ -308,49 +338,68 @@ public class TaskForm extends javax.swing.JFrame {
     }//GEN-LAST:event_taskOverviewTreeKeyPressed
 
     private void taskOverviewTreeCreateGroupActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_taskOverviewTreeCreateGroupActionPerformed
-        if (this.taskOverviewTree.isEditing()) return;
-    
-        final var model        = (javax.swing.tree.DefaultTreeModel) this.taskOverviewTree.getModel();
-        final var rootNode     = (javax.swing.tree.DefaultMutableTreeNode) model.getRoot();
+        if (this.taskOverviewTree.isEditing()) {
+            return;
+        }
+
+        final var model = (javax.swing.tree.DefaultTreeModel) this.taskOverviewTree.getModel();
+        final var rootNode = (javax.swing.tree.DefaultMutableTreeNode) model.getRoot();
         final var selectedNode = (javax.swing.tree.DefaultMutableTreeNode) this.taskOverviewTree.getLastSelectedPathComponent();
         final var newGroupNode = new javax.swing.tree.DefaultMutableTreeNode("Novo Grupo");
-        
+
         var parentNode = (selectedNode != null) ? selectedNode : rootNode;
-        if (!parentNode.getAllowsChildren()) parentNode = rootNode;
-        
+        if (!parentNode.getAllowsChildren())
+            parentNode = rootNode;
+
         model.insertNodeInto(newGroupNode, parentNode, parentNode.getChildCount());
 
         this.taskOverviewTree.scrollPathToVisible(new javax.swing.tree.TreePath(model.getPathToRoot(newGroupNode)));
         this.taskOverviewTree.startEditingAtPath(new javax.swing.tree.TreePath(newGroupNode.getPath()));
-
-        this.taskOverviewTree.getCellEditor().addCellEditorListener(new javax.swing.event.CellEditorListener() {
-            @Override
-            public void editingStopped(javax.swing.event.ChangeEvent e) {
-                if (newGroupNode == null) return;
-                final var newName = newGroupNode.getUserObject().toString().trim();
-
-                if (newName.isEmpty()) {
-                    final var parent = (javax.swing.tree.DefaultMutableTreeNode) newGroupNode.getParent();
-                    final var index  = parent != null ? parent.getIndex(newGroupNode) : -1;
-                
-                    if (index > 0) {
-                        final var prev = (javax.swing.tree.DefaultMutableTreeNode) parent.getChildAt(index - 1);
-                        final var path = new javax.swing.tree.TreePath(prev.getPath());
-                    
-                        model.removeNodeFromParent(newGroupNode);
-                    
-                        javax.swing.SwingUtilities.invokeLater(() -> {
-                            taskOverviewTree.setSelectionPath(path);
-                        });
-                    }
-                } else {
-                    model.nodeChanged(newGroupNode);
-                }
-            }
-            
-            @Override public void editingCanceled(javax.swing.event.ChangeEvent e) {}
-        });
     }//GEN-LAST:event_taskOverviewTreeCreateGroupActionPerformed
+
+    private void taskOverviewTreeValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_taskOverviewTreeValueChanged
+        final var selectedNode = (DefaultMutableTreeNode) taskOverviewTree.getLastSelectedPathComponent();
+        if (selectedNode == null)
+            return;
+        
+        final var title          = selectedNode.getUserObject().toString();
+        final var description    = tasks.getTaskDescription(title);
+        final var expirationDate = tasks.getTaskExpirationDate(title);
+        final var status         = tasks.getTaskStatus(title);
+        
+        this.descriptionArea.setText(description);
+        if (expirationDate != null) {
+            this.expirationDateCheckbox.setSelected(true);
+            this.expirationDateSpinner.setEnabled(true);
+            this.expirationDateSpinner.setValue(expirationDate);
+        } else {
+            this.expirationDateCheckbox.setSelected(false);
+            this.expirationDateSpinner.setEnabled(false);
+        }
+        
+        if (status == null) System.out.println("cú de velho");
+        
+        this.statusLabel.setSelectedItem(status);
+    }//GEN-LAST:event_taskOverviewTreeValueChanged
+
+    private void taskOverviewTreePropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_taskOverviewTreePropertyChange
+        if ("cellEditor".equals(evt.getPropertyName()) && !taskOverviewTree.isEditing()) {            
+            final var selectedNode = (DefaultMutableTreeNode) taskOverviewTree.getLastSelectedPathComponent();
+            if (selectedNode == null) return;
+        
+            final var newName = selectedNode.getUserObject().toString().trim();
+            if (newName.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "O nome da tarefa não pode ser vazio. Por favor, insira um nome válido.", "Erro", JOptionPane.ERROR_MESSAGE);
+                taskOverviewTree.startEditingAtPath(new javax.swing.tree.TreePath(selectedNode.getPath()));
+            } else {
+                final var parentNode = (DefaultMutableTreeNode) selectedNode.getParent();
+                final var index      = parentNode != null ? parentNode.getIndex(selectedNode) : -1;
+
+                if (!tasks.updateTask(tasks.getTaskByPos(index), newName, null, null, -1, -1))
+                    JOptionPane.showMessageDialog(this, "Erro ao atualizar a tarefa: " + tasks.getError(), "Erro", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }//GEN-LAST:event_taskOverviewTreePropertyChange
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private final javax.swing.JSplitPane Main = new javax.swing.JSplitPane();

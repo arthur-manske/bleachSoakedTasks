@@ -28,21 +28,23 @@ public class TaskDAO {
     public boolean insert(Task task)
     {
         if (!this.db.isInitialized()) return false;
+               
         if (task.getId() != -1)       return false;
         if (task.getTitle() == null)  return false;
         if (task.getStatus() == null) return false;
         
         this.dbOp = this.db.execute(
                 """
-                INSERT INTO tasks(title, description, status, expirationDate) VALUES (?, ?, ?, ?);
+                INSERT INTO tasks(title, description, pos, status, expirationDate) VALUES (?, ?, ?, ?, ?);
                 """,
                 task.getTitle(),
                 task.getDescription(),
-                task.getStatus(),
+                task.getStatus().ordinal(),
+                task.getPos(),
                 task.getExpirationDate()
         );        
-        
-        return (this.dbOp != null);
+                
+        return (this.dbOp.getError() == null);
     }
     
     public boolean delete(Task task)
@@ -57,7 +59,7 @@ public class TaskDAO {
                 task.getId()
         );
         
-        return (this.dbOp != null);
+        return (this.dbOp.getError() == null);
     }
     
     public boolean update(Task task)
@@ -68,16 +70,43 @@ public class TaskDAO {
         
         this.dbOp = this.db.execute(
                 """
-                UPDATE tasks SET title = ?, description = ?, expirationDate = ?, status = ? WHERE id = ?;
+                UPDATE tasks SET title = ?, description = ?, expirationDate = ?, pos = ?, status = ? WHERE id = ?;
                 """,
                 task.getTitle(),
                 task.getDescription(),
                 task.getExpirationDate(),
-                task.getStatus(),
+                task.getPos(),
+                task.getStatus().ordinal(),
                 task.getId()
         );
         
-        return (this.dbOp != null);
+        return (this.dbOp.getError() == null);
+    }
+    
+    public boolean queryByPos(Task task)
+    {
+        if (!this.db.isInitialized()) return false;
+        if (task.getId() != -1)       return false;
+        if (task.getPos() < 0)        return false;
+        
+        this.dbOp = this.db.execute(
+                """
+                SELECT id, description, expirationDate, pos, status FROM tasks WHERE pos = ?
+                """,
+                task.getPos()
+        );
+        
+        if (this.dbOp == null) return false;
+        
+        final var status = this.dbOp.getInt("status");
+
+        task.setId(this.dbOp.getInt("id"));
+        task.setDescription(this.dbOp.getString("description"));
+        task.setExpirationDate(this.dbOp.getDate("expirationDate"));
+        task.setId(this.dbOp.getInt("pos"));
+        task.setStatus(Task.Status.values()[status > 0 && status < 3 ? status : 0]);
+        
+        return (this.dbOp.getError() != null);
     }
     
     public boolean query(Task task)
@@ -88,17 +117,20 @@ public class TaskDAO {
         
         this.dbOp = this.db.execute(
                 """
-                SELECT id, description, expirationDate, status FROM tasks WHERE title = ?
+                SELECT id, description, expirationDate, pos, status FROM tasks WHERE title = ?
                 """,
                 task.getTitle()
         );
         
         if (this.dbOp == null) return false;
 
+        final var status = this.dbOp.getInt("status");
+
         task.setId(this.dbOp.getInt("id"));
         task.setDescription(this.dbOp.getString("description"));
         task.setExpirationDate(this.dbOp.getDate("expirationDate"));
-        task.setStatus(Task.Status.values()[this.dbOp.getInt("status")]);
+        task.setId(this.dbOp.getInt("pos"));
+        task.setStatus(Task.Status.values()[status > 0 && status < 3 ? status : 1]);
         
         return (this.dbOp.getError() != null);
     }
@@ -107,27 +139,32 @@ public class TaskDAO {
     {
        if (!this.db.isInitialized()) return false;
        if (buffer == null) return false;
-       
+
+
        this.dbOp = this.db.execute(
                """
-               SELECT id, title, description, expirationDate, status FROM tasks;
+               SELECT id, title, description, expirationDate, pos, status FROM tasks;
                """
        );
        
        if (this.dbOp == null || this.dbOp.getError() != null) return false;
 
-       while (this.dbOp.nextResult()) {
-           final var task = new Task(
+       do {
+           final var id     = this.dbOp.getInt("id");
+           final var status = this.dbOp.getInt("status");
+           final var task   = new Task(
                    this.dbOp.getString("title"),
-               this.dbOp.getString("description"),
-            this.dbOp.getDate("expirationDate"),
-                    Task.Status.values()[this.dbOp.getInt("status")]
+                   this.dbOp.getString("description"),
+                   this.dbOp.getDate("expirationDate"),
+                   this.dbOp.getInt("pos"),
+                   Task.Status.values()[status > 0 && status < 3 ? status : 0]
            );
            
-           task.setId(this.dbOp.getInt("id"));
+           task.setId(id);
            buffer.add(task);
-       }
-       
-       return (this.dbOp.getError() != null);
+       } while (this.dbOp.nextResult());
+
+       return true;
+       //return (this.dbOp.getError() != null);
     }
 }

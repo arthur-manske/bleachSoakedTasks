@@ -16,13 +16,16 @@ public class Task {
     private String description;
     private Date   expirationDate;
     private Status status;
+    private int    pos;
 
-    public Task(String title, String description, Date expirationDate, Status status)
+    public Task(String title, String description, Date expirationDate, int pos, Status status)
     {
         this.title          = title;
         this.description    = description;
+        this.pos            = pos;
         this.status         = status;
         this.expirationDate = expirationDate;
+        this.id             = -1;
     }
     
     public int getId()
@@ -63,6 +66,16 @@ public class Task {
     public void setExpirationDate(Date expirationDate)
     {
         this.expirationDate = expirationDate;
+    }
+    
+    public int getPos()
+    {
+        return pos;
+    }
+    
+    public void setPos(int pos)
+    {
+        this.pos = pos;
     }
 
     public Status getStatus()

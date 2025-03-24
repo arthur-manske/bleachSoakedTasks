@@ -25,7 +25,7 @@ public class DatabaseContainer implements AutoCloseable {
     
     public DatabaseContainer(String path)
     {
-        this.path = path;
+        this.path = "jdbc:sqlite:" + path;
     }
     
     @Override public void close()
@@ -46,9 +46,10 @@ public class DatabaseContainer implements AutoCloseable {
         final var sql = """
         CREATE TABLE IF NOT EXISTS tasks (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT NOT NULL UNIQUE,
+            title TEXT NOT NULL,
             description TEXT,
             expirationDate DATE,
+            pos INT NOT NULL,
             status INT
         );""";
         

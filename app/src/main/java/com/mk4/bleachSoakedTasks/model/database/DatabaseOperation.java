@@ -48,9 +48,8 @@ public class DatabaseOperation implements AutoCloseable {
         this.error = null;
 
         try {
-            for (int i = 0; i < args.length; ++i) {
+            for (int i = 0; i < args.length; ++i)
                 this.statement.setObject(i + 1, args[i]);
-            }
 
             this.statement.execute();
             this.rs = this.statement.getResultSet();
