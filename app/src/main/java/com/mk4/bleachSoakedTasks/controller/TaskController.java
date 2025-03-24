@@ -90,12 +90,10 @@ public class TaskController {
         if (newExpirationDate != null)
             task.setExpirationDate(newExpirationDate);
         
-        if (newStatus > 0 && newStatus < 2)
+        if (newStatus > 0 && newStatus < 3)
             task.setStatus(Task.Status.values()[newStatus]);
         
-        if (newPos > 0)
-            task.setPos(newPos);
-        
+        if (newPos > 0) task.setPos(newPos);
         return this.taskDAO.update(task);
     }
     
@@ -111,9 +109,7 @@ public class TaskController {
     {
        final var tasks = new ArrayList<Task>();
        if (!this.taskDAO.list(tasks)) return false;
-       
-       System.out.print("vai se foder");
-       
+              
        for (final var task : tasks)
            buffer.add(task.getTitle());
        

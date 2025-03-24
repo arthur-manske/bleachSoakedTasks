@@ -333,14 +333,12 @@ public class TaskForm extends javax.swing.JFrame {
     private void taskOverviewTreeKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_taskOverviewTreeKeyPressed
         if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_DELETE) {
             this.taskOverviewTreeDeleteActionPerformed(null);
-            return;
         }
     }//GEN-LAST:event_taskOverviewTreeKeyPressed
 
     private void taskOverviewTreeCreateGroupActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_taskOverviewTreeCreateGroupActionPerformed
-        if (this.taskOverviewTree.isEditing()) {
+        if (this.taskOverviewTree.isEditing())
             return;
-        }
 
         final var model = (javax.swing.tree.DefaultTreeModel) this.taskOverviewTree.getModel();
         final var rootNode = (javax.swing.tree.DefaultMutableTreeNode) model.getRoot();
@@ -376,14 +374,12 @@ public class TaskForm extends javax.swing.JFrame {
             this.expirationDateCheckbox.setSelected(false);
             this.expirationDateSpinner.setEnabled(false);
         }
-        
-        if (status == null) System.out.println("cú de velho");
-        
+                
         this.statusLabel.setSelectedItem(status);
     }//GEN-LAST:event_taskOverviewTreeValueChanged
 
     private void taskOverviewTreePropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_taskOverviewTreePropertyChange
-        if ("cellEditor".equals(evt.getPropertyName()) && !taskOverviewTree.isEditing()) {            
+        if ("editingStopped".equals(evt.getPropertyName()) && !taskOverviewTree.isEditing()) {            
             final var selectedNode = (DefaultMutableTreeNode) taskOverviewTree.getLastSelectedPathComponent();
             if (selectedNode == null) return;
         
