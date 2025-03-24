@@ -46,11 +46,11 @@ public class DatabaseContainer implements AutoCloseable {
         final var sql = """
         CREATE TABLE IF NOT EXISTS tasks (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT NOT NULL,
+            title TEXT NOT NULL UNIQUE,
             description TEXT,
-            expirationDate DATE,
             pos INT NOT NULL,
-            status INT
+            status INT,
+            expirationDate DATE
         );""";
         
         if (this.initialized) return null;

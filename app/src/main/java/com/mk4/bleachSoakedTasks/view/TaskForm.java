@@ -165,10 +165,10 @@ public class TaskForm extends javax.swing.JFrame {
 
         expirationDateLabel.setText("Prazo para conclusão");
 
-        statusLabel.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Pendente", "Concluída" }));
-        statusLabel.addActionListener(new java.awt.event.ActionListener() {
+        statusSelectionBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Pendente", "Concluída" }));
+        statusSelectionBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                statusLabelActionPerformed(evt);
+                statusSelectionBoxActionPerformed(evt);
             }
         });
 
@@ -195,7 +195,7 @@ public class TaskForm extends javax.swing.JFrame {
                     .addGroup(taskPanelLayout.createSequentialGroup()
                         .addComponent(descriptionLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(statusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 380, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(statusSelectionBox, javax.swing.GroupLayout.PREFERRED_SIZE, 380, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         taskPanelLayout.setVerticalGroup(
@@ -204,7 +204,7 @@ public class TaskForm extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(taskPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(descriptionLabel)
-                    .addComponent(statusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(statusSelectionBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(descriptionScroll, javax.swing.GroupLayout.DEFAULT_SIZE, 378, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -263,9 +263,12 @@ public class TaskForm extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void statusLabelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_statusLabelActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_statusLabelActionPerformed
+    private void statusSelectionBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_statusSelectionBoxActionPerformed
+        final var selectedNode = (DefaultMutableTreeNode) taskOverviewTree.getLastSelectedPathComponent();
+        if (selectedNode == null) return;
+        
+        this.tasks.updateTask((String) selectedNode.getUserObject(), null, null, null, -1, this.statusSelectionBox.getSelectedIndex() + 1);
+    }//GEN-LAST:event_statusSelectionBoxActionPerformed
 
     private void expirationDateCheckboxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_expirationDateCheckboxActionPerformed
         this.expirationDateSpinner.setEnabled(this.expirationDateCheckbox.isSelected());
@@ -348,7 +351,7 @@ public class TaskForm extends javax.swing.JFrame {
         var parentNode = (selectedNode != null) ? selectedNode : rootNode;
         if (!parentNode.getAllowsChildren())
             parentNode = rootNode;
-
+        
         model.insertNodeInto(newGroupNode, parentNode, parentNode.getChildCount());
 
         this.taskOverviewTree.scrollPathToVisible(new javax.swing.tree.TreePath(model.getPathToRoot(newGroupNode)));
@@ -375,7 +378,7 @@ public class TaskForm extends javax.swing.JFrame {
             this.expirationDateSpinner.setEnabled(false);
         }
                 
-        this.statusLabel.setSelectedItem(status);
+        this.statusSelectionBox.setSelectedItem(status);
     }//GEN-LAST:event_taskOverviewTreeValueChanged
 
     private void taskOverviewTreePropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_taskOverviewTreePropertyChange
@@ -409,7 +412,7 @@ public class TaskForm extends javax.swing.JFrame {
     private final javax.swing.JMenu fileMenu = new javax.swing.JMenu();
     private final javax.swing.JMenu helpMenu = new javax.swing.JMenu();
     private final javax.swing.JMenuBar menuBar = new javax.swing.JMenuBar();
-    private final javax.swing.JComboBox<String> statusLabel = new javax.swing.JComboBox<>();
+    private final javax.swing.JComboBox<String> statusSelectionBox = new javax.swing.JComboBox<>();
     private final javax.swing.JPanel taskOverviewPanel = new javax.swing.JPanel();
     private final javax.swing.JScrollPane taskOverviewScroll = new javax.swing.JScrollPane();
     private final javax.swing.JTree taskOverviewTree = new javax.swing.JTree();

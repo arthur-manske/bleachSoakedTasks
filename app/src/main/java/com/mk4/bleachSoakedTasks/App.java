@@ -2,6 +2,7 @@ package com.mk4.bleachSoakedTasks;
 
 import com.mk4.bleachSoakedTasks.controller.TaskController;
 import com.mk4.bleachSoakedTasks.controller.WindowPreferencesController;
+import com.mk4.bleachSoakedTasks.model.Task;
 
 import com.mk4.bleachSoakedTasks.view.TaskForm;
 

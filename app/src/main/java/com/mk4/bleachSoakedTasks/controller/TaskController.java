@@ -45,10 +45,10 @@ public class TaskController {
     
     public String getTaskStatus(String title)
     {
-        final var task = new Task(title, null, null, 0, null);
+        final var task = new Task(title, null, null, -1, null);
         if (title == null || title.isBlank()) return null;
         if (!this.taskDAO.query(task)) return null;
-        
+                
         return task.getStatus() == Task.Status.PENDING ? "Pendente" : "Concluída";
     }
     
