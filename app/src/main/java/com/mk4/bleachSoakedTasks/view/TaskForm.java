@@ -127,6 +127,8 @@ public class TaskForm extends javax.swing.JFrame {
 
         descriptionArea.setColumns(20);
         descriptionArea.setRows(5);
+        descriptionArea.setText("Selecione ou crie uma tarefa...");
+        descriptionArea.setEnabled(false);
         descriptionArea.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 descriptionAreaKeyPressed(evt);
@@ -147,6 +149,7 @@ public class TaskForm extends javax.swing.JFrame {
         expirationDateLabel.setText("Prazo para conclusão");
 
         statusComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Pendente", "Concluída" }));
+        statusComboBox.setEnabled(false);
         statusComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 statusComboBoxActionPerformed(evt);
@@ -154,6 +157,7 @@ public class TaskForm extends javax.swing.JFrame {
         });
 
         expirationDateCheckbox.setText("Possui prazo limite");
+        expirationDateCheckbox.setEnabled(false);
         expirationDateCheckbox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 expirationDateCheckboxActionPerformed(evt);
@@ -318,7 +322,13 @@ public class TaskForm extends javax.swing.JFrame {
                 return;
             }
             
-            model.removeNodeFromParent(selectedNode);   
+            model.removeNodeFromParent(selectedNode);
+            
+            this.expirationDateCheckbox.setEnabled(false);
+            this.descriptionArea.setEnabled(false);
+            this.statusComboBox.setEnabled(false);
+                
+            this.descriptionArea.setText("Selecione ou crie uma tarefa...");
         }
     }//GEN-LAST:event_taskOverviewTreeDeleteActionPerformed
 
@@ -337,6 +347,10 @@ public class TaskForm extends javax.swing.JFrame {
         final var description    = tasks.getTaskDescription(title);
         final var expirationDate = tasks.getTaskExpirationDate(title);
         final var status         = tasks.getTaskStatus(title);
+        
+        this.expirationDateCheckbox.setEnabled(true);
+        this.descriptionArea.setEnabled(true);
+        this.statusComboBox.setEnabled(true);
                 
         this.descriptionArea.setText(description);
         if (expirationDate != null) {

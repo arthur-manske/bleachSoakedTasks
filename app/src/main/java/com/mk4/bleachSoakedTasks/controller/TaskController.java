@@ -28,7 +28,8 @@ public class TaskController {
     
     public boolean addTask(String title, String description, Date expirationDate, int status)
     {
-        if (title != null && title.isBlank()) title = null;        
+        if (title != null && title.isBlank()) title = null;    
+        
         return this.taskDAO.insert(new Task(title, description, expirationDate, (status > -1 && status < 2) ? Task.Status.values()[status] : null));
     }
     

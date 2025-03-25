@@ -285,6 +285,8 @@
                   <Properties>
                     <Property name="columns" type="int" value="20"/>
                     <Property name="rows" type="int" value="5"/>
+                    <Property name="text" type="java.lang.String" value="Selecione ou crie uma tarefa..."/>
+                    <Property name="enabled" type="boolean" value="false"/>
                   </Properties>
                   <Events>
                     <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="descriptionAreaKeyPressed"/>
@@ -335,6 +337,7 @@
                     <StringItem index="1" value="Conclu&#xed;da"/>
                   </StringArray>
                 </Property>
+                <Property name="enabled" type="boolean" value="false"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="statusComboBoxActionPerformed"/>
@@ -347,6 +350,7 @@
             <Component class="javax.swing.JCheckBox" name="expirationDateCheckbox">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Possui prazo limite"/>
+                <Property name="enabled" type="boolean" value="false"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="expirationDateCheckboxActionPerformed"/>
