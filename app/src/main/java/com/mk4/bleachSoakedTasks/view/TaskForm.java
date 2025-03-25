@@ -1,63 +1,70 @@
 package com.mk4.bleachSoakedTasks.view;
 
+import com.mk4.bleachSoakedTasks.controller.TaskController;
 import com.mk4.bleachSoakedTasks.controller.WindowPreferencesController;
+import java.util.ArrayList;
+import java.util.Date;
 import javax.swing.JOptionPane;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 
 /**
  * TaskForm implements the main view for the application
  * @author Arthur de Souza Manske
  */
 public class TaskForm extends javax.swing.JFrame {
+    private final TaskController tasks;
     private final WindowPreferencesController windowPrefs;
     
     /**
      * Creates new form TaskForm
+     * @param tasks The controller for the tasks
      * @param windowPrefs The controller for window preferences
      */
-    public TaskForm(WindowPreferencesController windowPrefs)
+    public TaskForm(TaskController tasks, WindowPreferencesController windowPrefs)
     {
+        this.tasks = tasks;
         this.windowPrefs = windowPrefs;
         
         initComponents();
+        
+        this.updateTree();
     }
 
+    private void updateTree() {
+        final var model = (DefaultTreeModel) this.taskOverviewTree.getModel();
+        final var root  = (DefaultMutableTreeNode) (model != null ? model.getRoot() : null);
+
+        if (model == null || root == null) {
+            return;
+        }
+
+        final var contents = new ArrayList<String>();
+        if (!this.tasks.listTasks(contents)) {
+            JOptionPane.showMessageDialog(null, "Erro no banco de dados: " + this.tasks.getError(), "Erro", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        root.removeAllChildren();
+        for (final var content : contents) {
+            final var newNode = new DefaultMutableTreeNode(content, false);
+            model.insertNodeInto(newNode, root, root.getChildCount());
+            System.err.println(content + ": " + this.tasks.getTaskStatus(content));
+        }
+
+        model.reload();
+    }
+    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         taskOverviewTreeContextMenu = new javax.swing.JPopupMenu();
-        taskOverviewTreeCreateMenu = new javax.swing.JMenu();
-        taskOverviewTreeCreateGroup = new javax.swing.JMenuItem();
-        taskOverviewTreeCreateTask = new javax.swing.JMenuItem();
         taskOverviewTreeDelete = new javax.swing.JMenuItem();
+        taskOverviewTreeCreateTask = new javax.swing.JMenuItem();
 
         taskOverviewTreeContextMenu.setInvoker(taskOverviewTree);
         taskOverviewTreeContextMenu.setPopupSize(new java.awt.Dimension(120, 50));
-
-        taskOverviewTreeCreateMenu.setText("Criar");
-        taskOverviewTreeCreateMenu.setToolTipText("Menu de criação");
-
-        taskOverviewTreeCreateGroup.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_G, java.awt.event.InputEvent.CTRL_DOWN_MASK));
-        taskOverviewTreeCreateGroup.setText("Criar novo grupo de tarefas");
-        taskOverviewTreeCreateGroup.setToolTipText("Divide e organiza as tarefas (Ctrl+G)");
-        taskOverviewTreeCreateGroup.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                taskOverviewTreeCreateGroupActionPerformed(evt);
-            }
-        });
-        taskOverviewTreeCreateMenu.add(taskOverviewTreeCreateGroup);
-
-        taskOverviewTreeCreateTask.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_N, java.awt.event.InputEvent.CTRL_DOWN_MASK));
-        taskOverviewTreeCreateTask.setText("Criar tarefa");
-        taskOverviewTreeCreateTask.setToolTipText("Nova tarefa dentro do grupo atual (Ctrl+N)");
-        taskOverviewTreeCreateTask.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                taskOverviewTreeCreateTaskActionPerformed(evt);
-            }
-        });
-        taskOverviewTreeCreateMenu.add(taskOverviewTreeCreateTask);
-
-        taskOverviewTreeContextMenu.add(taskOverviewTreeCreateMenu);
 
         taskOverviewTreeDelete.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_DELETE, 0));
         taskOverviewTreeDelete.setText("Deletar");
@@ -68,6 +75,16 @@ public class TaskForm extends javax.swing.JFrame {
             }
         });
         taskOverviewTreeContextMenu.add(taskOverviewTreeDelete);
+
+        taskOverviewTreeCreateTask.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_N, java.awt.event.InputEvent.CTRL_DOWN_MASK));
+        taskOverviewTreeCreateTask.setText("Criar tarefa");
+        taskOverviewTreeCreateTask.setToolTipText("Nova tarefa dentro do grupo atual (Ctrl+N)");
+        taskOverviewTreeCreateTask.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                taskOverviewTreeCreateTaskActionPerformed(evt);
+            }
+        });
+        taskOverviewTreeContextMenu.add(taskOverviewTreeCreateTask);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Lista de Tarefas");
@@ -80,8 +97,12 @@ public class TaskForm extends javax.swing.JFrame {
         taskOverviewTree.setFont(new java.awt.Font("Franklin Gothic Book", 0, 12)); // NOI18N
         taskOverviewTree.setComponentPopupMenu(taskOverviewTreeContextMenu);
         taskOverviewTree.setDragEnabled(true);
-        taskOverviewTree.setDropMode(javax.swing.DropMode.ON_OR_INSERT);
-        taskOverviewTree.setEditable(true);
+        taskOverviewTree.setRootVisible(false);
+        taskOverviewTree.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
+            public void valueChanged(javax.swing.event.TreeSelectionEvent evt) {
+                taskOverviewTreeValueChanged(evt);
+            }
+        });
         taskOverviewTree.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 taskOverviewTreeKeyPressed(evt);
@@ -106,19 +127,29 @@ public class TaskForm extends javax.swing.JFrame {
 
         descriptionArea.setColumns(20);
         descriptionArea.setRows(5);
+        descriptionArea.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                descriptionAreaKeyPressed(evt);
+            }
+        });
         descriptionScroll.setViewportView(descriptionArea);
 
         expirationDateSpinner.setModel(new javax.swing.SpinnerDateModel(new java.util.Date(), null, null, java.util.Calendar.SECOND));
         expirationDateSpinner.setEnabled(expirationDateCheckbox.isSelected());
+        expirationDateSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                expirationDateSpinnerStateChanged(evt);
+            }
+        });
 
         descriptionLabel.setText("Descrição da tarefa");
 
         expirationDateLabel.setText("Prazo para conclusão");
 
-        statusLabel.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Pendente", "Concluída" }));
-        statusLabel.addActionListener(new java.awt.event.ActionListener() {
+        statusComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Pendente", "Concluída" }));
+        statusComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                statusLabelActionPerformed(evt);
+                statusComboBoxActionPerformed(evt);
             }
         });
 
@@ -145,7 +176,7 @@ public class TaskForm extends javax.swing.JFrame {
                     .addGroup(taskPanelLayout.createSequentialGroup()
                         .addComponent(descriptionLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(statusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 380, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(statusComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 380, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         taskPanelLayout.setVerticalGroup(
@@ -154,7 +185,7 @@ public class TaskForm extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(taskPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(descriptionLabel)
-                    .addComponent(statusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(statusComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(descriptionScroll, javax.swing.GroupLayout.DEFAULT_SIZE, 378, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -211,14 +242,26 @@ public class TaskForm extends javax.swing.JFrame {
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
-
-    private void statusLabelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_statusLabelActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_statusLabelActionPerformed
+ 
+    private void statusComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_statusComboBoxActionPerformed
+        final var selectedNode = (javax.swing.tree.DefaultMutableTreeNode) this.taskOverviewTree.getLastSelectedPathComponent();
+        if (selectedNode == null) return;
+        
+        var date = (Date) this.expirationDateSpinner.getValue();
+        if (this.expirationDateSpinner.isEnabled() == false) {
+            date = null;
+        }
+                
+        if (!this.tasks.updateTask((String) selectedNode.getUserObject(), this.descriptionArea.getText(), date, this.statusComboBox.getSelectedIndex())) {
+            JOptionPane.showMessageDialog(null, "Erro ao atualizar tarefa: " + this.tasks.getError(), "Erro fatal e mortal", JOptionPane.ERROR_MESSAGE);
+        }        
+    }//GEN-LAST:event_statusComboBoxActionPerformed
 
     private void expirationDateCheckboxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_expirationDateCheckboxActionPerformed
         this.expirationDateSpinner.setEnabled(this.expirationDateCheckbox.isSelected());
+        statusComboBoxActionPerformed(null);
     }//GEN-LAST:event_expirationDateCheckboxActionPerformed
 
     private void windowMenuDarkModeCheckboxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_windowMenuDarkModeCheckboxActionPerformed
@@ -234,50 +277,23 @@ public class TaskForm extends javax.swing.JFrame {
     }//GEN-LAST:event_windowMenuDarkModeCheckboxActionPerformed
 
     private void taskOverviewTreeCreateTaskActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_taskOverviewTreeCreateTaskActionPerformed
-        if (this.taskOverviewTree.isEditing()) return;
-    
-        if (this.taskOverviewTree.isEditing()) return;
-    
         final var model        = (javax.swing.tree.DefaultTreeModel) this.taskOverviewTree.getModel();
         final var rootNode     = (javax.swing.tree.DefaultMutableTreeNode) model.getRoot();
         final var selectedNode = (javax.swing.tree.DefaultMutableTreeNode) this.taskOverviewTree.getLastSelectedPathComponent();
-        final var newNode       = new javax.swing.tree.DefaultMutableTreeNode("Nova tarefa", false);
+        final var newNode      = new javax.swing.tree.DefaultMutableTreeNode(JOptionPane.showInputDialog(this, "Digite o nome da nova tarefa:", "Nova Tarefa", JOptionPane.QUESTION_MESSAGE), false);
 
         var parentNode = (selectedNode != null) ? selectedNode : rootNode;
         if (!parentNode.getAllowsChildren()) parentNode = rootNode;
-    
+        
+        if (!this.tasks.addTask((String) newNode.getUserObject(), null, null, 0)) {
+            JOptionPane.showMessageDialog(null, "Erro ao criar nova tarefa: " + this.tasks.getError(), "Erro fatal e mortal", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
         model.insertNodeInto(newNode, parentNode, parentNode.getChildCount());
         
         this.taskOverviewTree.scrollPathToVisible(new javax.swing.tree.TreePath(model.getPathToRoot(newNode)));
         this.taskOverviewTree.startEditingAtPath(new javax.swing.tree.TreePath(newNode.getPath()));
-
-        this.taskOverviewTree.getCellEditor().addCellEditorListener(new javax.swing.event.CellEditorListener() {
-            @Override
-            public void editingStopped(javax.swing.event.ChangeEvent e) {
-                if (newNode == null) return;
-                final var newName = newNode.getUserObject().toString().trim();
-
-                if (newName.isEmpty()) {
-                    final var parent = (javax.swing.tree.DefaultMutableTreeNode) newNode.getParent();
-                    final var index  = parent != null ? parent.getIndex(newNode) : -1;
-                
-                    if (index > 0) {
-                        final var prev = (javax.swing.tree.DefaultMutableTreeNode) parent.getChildAt(index - 1);
-                        final var path = new javax.swing.tree.TreePath(prev.getPath());
-                    
-                        model.removeNodeFromParent(newNode);
-                    
-                        javax.swing.SwingUtilities.invokeLater(() -> {
-                            taskOverviewTree.setSelectionPath(path);
-                        });
-                    }
-                } else {
-                    model.nodeChanged(newNode);
-                }
-            }
-            
-            @Override public void editingCanceled(javax.swing.event.ChangeEvent e) {}
-        });
     }//GEN-LAST:event_taskOverviewTreeCreateTaskActionPerformed
 
     private void taskOverviewTreeDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_taskOverviewTreeDeleteActionPerformed
@@ -291,66 +307,58 @@ public class TaskForm extends javax.swing.JFrame {
 
         int confirm = JOptionPane.showConfirmDialog(
             this,
-            "Tem certeza que deseja excluir o item selecionado?",
+            "Tem certeza que deseja excluir a tarefa \"" + (String) selectedNode.getUserObject() + "\"",
             "Confirmação",
             JOptionPane.YES_NO_OPTION
         );
 
-        if (confirm == JOptionPane.YES_OPTION)
-            model.removeNodeFromParent(selectedNode);
+        if (confirm == JOptionPane.YES_OPTION) {
+            if (!this.tasks.delTask((String) selectedNode.getUserObject())) {
+                JOptionPane.showMessageDialog(null, "Erro ao deletar tarefa: " + this.tasks.getError(), "Erro fatal e mortal", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
+            model.removeNodeFromParent(selectedNode);   
+        }
     }//GEN-LAST:event_taskOverviewTreeDeleteActionPerformed
 
     private void taskOverviewTreeKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_taskOverviewTreeKeyPressed
         if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_DELETE) {
             this.taskOverviewTreeDeleteActionPerformed(null);
-            return;
         }
     }//GEN-LAST:event_taskOverviewTreeKeyPressed
 
-    private void taskOverviewTreeCreateGroupActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_taskOverviewTreeCreateGroupActionPerformed
-        if (this.taskOverviewTree.isEditing()) return;
-    
-        final var model        = (javax.swing.tree.DefaultTreeModel) this.taskOverviewTree.getModel();
-        final var rootNode     = (javax.swing.tree.DefaultMutableTreeNode) model.getRoot();
-        final var selectedNode = (javax.swing.tree.DefaultMutableTreeNode) this.taskOverviewTree.getLastSelectedPathComponent();
-        final var newGroupNode = new javax.swing.tree.DefaultMutableTreeNode("Novo Grupo");
+    private void taskOverviewTreeValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_taskOverviewTreeValueChanged
+        final var selectedNode = (DefaultMutableTreeNode) taskOverviewTree.getLastSelectedPathComponent();
+        if (selectedNode == null)
+            return;
         
-        var parentNode = (selectedNode != null) ? selectedNode : rootNode;
-        if (!parentNode.getAllowsChildren()) parentNode = rootNode;
-        
-        model.insertNodeInto(newGroupNode, parentNode, parentNode.getChildCount());
-
-        this.taskOverviewTree.scrollPathToVisible(new javax.swing.tree.TreePath(model.getPathToRoot(newGroupNode)));
-        this.taskOverviewTree.startEditingAtPath(new javax.swing.tree.TreePath(newGroupNode.getPath()));
-
-        this.taskOverviewTree.getCellEditor().addCellEditorListener(new javax.swing.event.CellEditorListener() {
-            @Override
-            public void editingStopped(javax.swing.event.ChangeEvent e) {
-                if (newGroupNode == null) return;
-                final var newName = newGroupNode.getUserObject().toString().trim();
-
-                if (newName.isEmpty()) {
-                    final var parent = (javax.swing.tree.DefaultMutableTreeNode) newGroupNode.getParent();
-                    final var index  = parent != null ? parent.getIndex(newGroupNode) : -1;
+        final var title          = (String) selectedNode.getUserObject();
+        final var description    = tasks.getTaskDescription(title);
+        final var expirationDate = tasks.getTaskExpirationDate(title);
+        final var status         = tasks.getTaskStatus(title);
                 
-                    if (index > 0) {
-                        final var prev = (javax.swing.tree.DefaultMutableTreeNode) parent.getChildAt(index - 1);
-                        final var path = new javax.swing.tree.TreePath(prev.getPath());
-                    
-                        model.removeNodeFromParent(newGroupNode);
-                    
-                        javax.swing.SwingUtilities.invokeLater(() -> {
-                            taskOverviewTree.setSelectionPath(path);
-                        });
-                    }
-                } else {
-                    model.nodeChanged(newGroupNode);
-                }
-            }
-            
-            @Override public void editingCanceled(javax.swing.event.ChangeEvent e) {}
-        });
-    }//GEN-LAST:event_taskOverviewTreeCreateGroupActionPerformed
+        this.descriptionArea.setText(description);
+        if (expirationDate != null) {
+            this.expirationDateCheckbox.setSelected(true);
+            this.expirationDateSpinner.setEnabled(true);
+            this.expirationDateSpinner.setValue(expirationDate);
+        } else {
+            this.expirationDateCheckbox.setSelected(false);
+            this.expirationDateSpinner.setEnabled(false);
+            this.expirationDateSpinner.setValue(new Date());
+        }
+                
+        this.statusComboBox.setSelectedItem(status);
+    }//GEN-LAST:event_taskOverviewTreeValueChanged
+
+    private void descriptionAreaKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_descriptionAreaKeyPressed
+        this.statusComboBoxActionPerformed(null);
+    }//GEN-LAST:event_descriptionAreaKeyPressed
+
+    private void expirationDateSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_expirationDateSpinnerStateChanged
+        this.statusComboBoxActionPerformed(null);
+    }//GEN-LAST:event_expirationDateSpinnerStateChanged
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private final javax.swing.JSplitPane Main = new javax.swing.JSplitPane();
@@ -364,13 +372,11 @@ public class TaskForm extends javax.swing.JFrame {
     private final javax.swing.JMenu fileMenu = new javax.swing.JMenu();
     private final javax.swing.JMenu helpMenu = new javax.swing.JMenu();
     private final javax.swing.JMenuBar menuBar = new javax.swing.JMenuBar();
-    private final javax.swing.JComboBox<String> statusLabel = new javax.swing.JComboBox<>();
+    private final javax.swing.JComboBox<String> statusComboBox = new javax.swing.JComboBox<>();
     private final javax.swing.JPanel taskOverviewPanel = new javax.swing.JPanel();
     private final javax.swing.JScrollPane taskOverviewScroll = new javax.swing.JScrollPane();
     private final javax.swing.JTree taskOverviewTree = new javax.swing.JTree();
     private javax.swing.JPopupMenu taskOverviewTreeContextMenu;
-    private javax.swing.JMenuItem taskOverviewTreeCreateGroup;
-    private javax.swing.JMenu taskOverviewTreeCreateMenu;
     private javax.swing.JMenuItem taskOverviewTreeCreateTask;
     private javax.swing.JMenuItem taskOverviewTreeDelete;
     private final javax.swing.JPanel taskPanel = new javax.swing.JPanel();

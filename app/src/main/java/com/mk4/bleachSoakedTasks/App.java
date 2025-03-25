@@ -1,5 +1,6 @@
 package com.mk4.bleachSoakedTasks;
 
+import com.mk4.bleachSoakedTasks.controller.TaskController;
 import com.mk4.bleachSoakedTasks.controller.WindowPreferencesController;
 
 import com.mk4.bleachSoakedTasks.view.TaskForm;
@@ -10,14 +11,16 @@ import com.mk4.bleachSoakedTasks.view.TaskForm;
  */
 public class App {
     private WindowPreferencesController winPrefsController;
+    private TaskController              taskController;
     private TaskForm                    taskForm;
 
     private App()
     {
         this.winPrefsController = new WindowPreferencesController(this.getClass().getName());
-
+        this.taskController     = new TaskController("tasks.db");
+        
         this.winPrefsController.apply(null);
-        this.taskForm = new TaskForm(this.winPrefsController);
+        this.taskForm = new TaskForm(this.taskController, this.winPrefsController);
     }
 
     private void run()

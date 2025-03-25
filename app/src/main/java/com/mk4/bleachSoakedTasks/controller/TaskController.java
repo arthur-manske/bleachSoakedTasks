@@ -21,15 +21,15 @@ public class TaskController {
         this.db      = new DatabaseContainer(dbPath);
         this.taskDAO = new TaskDAO(this.db);
         
-        System.err.println("Erro ao iniciar o banco de dados: " + this.db.initialize());
+        final var error = this.db.initialize();
+        if (error != null)
+            System.err.println("Erro ao iniciar o banco de dados: " + this.db.initialize());
     }
     
     public boolean addTask(String title, String description, Date expirationDate, int status)
     {
-        if (title == null || title.isEmpty()) return false;
-        if (status < 0 || status > 1) return false;
-        
-        return this.taskDAO.insert(new Task(title, description, expirationDate, Task.Status.values()[status]));
+        if (title != null && title.isBlank()) title = null;        
+        return this.taskDAO.insert(new Task(title, description, expirationDate, (status > -1 && status < 2) ? Task.Status.values()[status] : null));
     }
     
     public boolean updateTask(String title, String newDescription, Date newExpirationDate, int newStatus)
@@ -37,13 +37,13 @@ public class TaskController {
         final var task = new Task(title, null, null, null);
         if (!this.taskDAO.query(task)) return false;
         
-        if (newDescription != null && !newDescription.equals(""))
+        if (newDescription != null && !newDescription.isBlank())
             task.setDescription(newDescription);
         
         if (newExpirationDate != null)
             task.setExpirationDate(newExpirationDate);
         
-        if (newStatus > 0 && newStatus < 2)
+        if (newStatus > -1 && newStatus < 2)
             task.setStatus(Task.Status.values()[newStatus]);
         
         return this.taskDAO.update(task);
@@ -55,6 +55,32 @@ public class TaskController {
         if (!this.taskDAO.query(task)) return false;
         
         return this.taskDAO.delete(task);
+    }
+    
+    public String getTaskDescription(String title)
+    {
+        final var task = new Task(title, null, null, null);
+        if (!this.taskDAO.query(task)) return null;
+        
+        return task.getDescription();
+    }
+    
+    public Date getTaskExpirationDate(String title)
+    {
+        final var task = new Task(title, null, null, null);
+        if (!this.taskDAO.query(task)) return null;
+        
+        return task.getExpirationDate();
+    }
+    
+    public String getTaskStatus(String title)
+    {
+        final var task = new Task(title, null, null, null);
+        System.err.println("getTaskStatus: Chegou no primeiro checkpoint");
+        if (!this.taskDAO.query(task)) return null;
+        System.err.println("getTaskStatus: Chegou no segundo checkpoint");
+
+        return task.getStatus() == Task.Status.PENDING ? "Pendente" : "Concluída";
     }
     
     public boolean listTasks(List<String> buffer)

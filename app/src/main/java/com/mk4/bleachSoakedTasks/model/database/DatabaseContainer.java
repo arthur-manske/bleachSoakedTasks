@@ -25,7 +25,7 @@ public class DatabaseContainer implements AutoCloseable {
     
     public DatabaseContainer(String path)
     {
-        this.path = path;
+        this.path = "jdbc:sqlite:" + path;
     }
     
     @Override public void close()
@@ -80,6 +80,7 @@ public class DatabaseContainer implements AutoCloseable {
         
     public boolean isInitialized()
     {
+        System.err.println("Database foi inciciada? " + this.initialized);
         return this.initialized;
     }
     

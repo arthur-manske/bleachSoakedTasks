@@ -28,9 +28,6 @@ public class TaskDAO {
     public boolean insert(Task task)
     {
         if (!this.db.isInitialized()) return false;
-        if (task.getId() != -1)       return false;
-        if (task.getTitle() == null)  return false;
-        if (task.getStatus() == null) return false;
         
         this.dbOp = this.db.execute(
                 """
@@ -42,7 +39,7 @@ public class TaskDAO {
                 task.getExpirationDate()
         );        
         
-        return (this.dbOp != null);
+        return (this.dbOp.getError() == null);
     }
     
     public boolean delete(Task task)
@@ -57,7 +54,7 @@ public class TaskDAO {
                 task.getId()
         );
         
-        return (this.dbOp != null);
+        return (this.dbOp.getError() == null);
     }
     
     public boolean update(Task task)
@@ -73,19 +70,15 @@ public class TaskDAO {
                 task.getTitle(),
                 task.getDescription(),
                 task.getExpirationDate(),
-                task.getStatus(),
+                task.getStatus().ordinal(),
                 task.getId()
         );
         
-        return (this.dbOp != null);
+        return (this.dbOp.getError() == null);
     }
     
     public boolean query(Task task)
-    {
-        if (!this.db.isInitialized()) return false;
-        if (task.getId() != -1)       return false;
-        if (task.getTitle() == null)  return false;
-        
+    {        
         this.dbOp = this.db.execute(
                 """
                 SELECT id, description, expirationDate, status FROM tasks WHERE title = ?
@@ -93,14 +86,15 @@ public class TaskDAO {
                 task.getTitle()
         );
         
-        if (this.dbOp == null) return false;
-
+        if (!this.dbOp.nextResult())
+            return false;
+        
         task.setId(this.dbOp.getInt("id"));
         task.setDescription(this.dbOp.getString("description"));
         task.setExpirationDate(this.dbOp.getDate("expirationDate"));
         task.setStatus(Task.Status.values()[this.dbOp.getInt("status")]);
         
-        return (this.dbOp.getError() != null);
+        return (this.dbOp.getError() == null);
     }
     
     public boolean list(List<Task> buffer)
@@ -128,6 +122,6 @@ public class TaskDAO {
            buffer.add(task);
        }
        
-       return (this.dbOp.getError() != null);
+       return (this.dbOp.getError() == null);
     }
 }

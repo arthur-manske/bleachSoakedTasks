@@ -16,38 +16,6 @@
         <Property name="useNullLayout" type="boolean" value="true"/>
       </Layout>
       <SubComponents>
-        <Menu class="javax.swing.JMenu" name="taskOverviewTreeCreateMenu">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Criar"/>
-            <Property name="toolTipText" type="java.lang.String" value="Menu de cria&#xe7;&#xe3;o"/>
-          </Properties>
-          <SubComponents>
-            <MenuItem class="javax.swing.JMenuItem" name="taskOverviewTreeCreateGroup">
-              <Properties>
-                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
-                  <KeyStroke key="Ctrl+G"/>
-                </Property>
-                <Property name="text" type="java.lang.String" value="Criar novo grupo de tarefas"/>
-                <Property name="toolTipText" type="java.lang.String" value="Divide e organiza as tarefas (Ctrl+G)"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="taskOverviewTreeCreateGroupActionPerformed"/>
-              </Events>
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="taskOverviewTreeCreateTask">
-              <Properties>
-                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
-                  <KeyStroke key="Ctrl+N"/>
-                </Property>
-                <Property name="text" type="java.lang.String" value="Criar tarefa"/>
-                <Property name="toolTipText" type="java.lang.String" value="Nova tarefa dentro do grupo atual (Ctrl+N)"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="taskOverviewTreeCreateTaskActionPerformed"/>
-              </Events>
-            </MenuItem>
-          </SubComponents>
-        </Menu>
         <MenuItem class="javax.swing.JMenuItem" name="taskOverviewTreeDelete">
           <Properties>
             <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
@@ -58,6 +26,18 @@
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="taskOverviewTreeDeleteActionPerformed"/>
+          </Events>
+        </MenuItem>
+        <MenuItem class="javax.swing.JMenuItem" name="taskOverviewTreeCreateTask">
+          <Properties>
+            <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
+              <KeyStroke key="Ctrl+N"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="Criar tarefa"/>
+            <Property name="toolTipText" type="java.lang.String" value="Nova tarefa dentro do grupo atual (Ctrl+N)"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="taskOverviewTreeCreateTaskActionPerformed"/>
           </Events>
         </MenuItem>
       </SubComponents>
@@ -137,7 +117,7 @@
   <SyntheticProperties>
     <SyntheticProperty name="menuBar" type="java.lang.String" value="menuBar"/>
     <SyntheticProperty name="formSizePolicy" type="int" value="1"/>
-    <SyntheticProperty name="generateCenter" type="boolean" value="false"/>
+    <SyntheticProperty name="generateCenter" type="boolean" value="true"/>
   </SyntheticProperties>
   <AuxValues>
     <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
@@ -223,12 +203,10 @@
                       <ComponentRef name="taskOverviewTreeContextMenu"/>
                     </Property>
                     <Property name="dragEnabled" type="boolean" value="true"/>
-                    <Property name="dropMode" type="javax.swing.DropMode" editor="org.netbeans.modules.form.editors.EnumEditor">
-                      <Value id="ON_OR_INSERT"/>
-                    </Property>
-                    <Property name="editable" type="boolean" value="true"/>
+                    <Property name="rootVisible" type="boolean" value="false"/>
                   </Properties>
                   <Events>
+                    <EventHandler event="valueChanged" listener="javax.swing.event.TreeSelectionListener" parameters="javax.swing.event.TreeSelectionEvent" handler="taskOverviewTreeValueChanged"/>
                     <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="taskOverviewTreeKeyPressed"/>
                   </Events>
                   <AuxValues>
@@ -265,7 +243,7 @@
                           <Group type="102" alignment="1" attributes="0">
                               <Component id="descriptionLabel" min="-2" pref="143" max="-2" attributes="0"/>
                               <EmptySpace max="32767" attributes="0"/>
-                              <Component id="statusLabel" min="-2" pref="380" max="-2" attributes="0"/>
+                              <Component id="statusComboBox" min="-2" pref="380" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
@@ -278,7 +256,7 @@
                       <EmptySpace min="-2" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="descriptionLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="statusLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="statusComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Component id="descriptionScroll" pref="378" max="32767" attributes="0"/>
@@ -308,6 +286,9 @@
                     <Property name="columns" type="int" value="20"/>
                     <Property name="rows" type="int" value="5"/>
                   </Properties>
+                  <Events>
+                    <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="descriptionAreaKeyPressed"/>
+                  </Events>
                   <AuxValues>
                     <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="18"/>
                   </AuxValues>
@@ -323,6 +304,9 @@
                   <Connection component="expirationDateCheckbox" name="isSelected" type="method"/>
                 </Property>
               </Properties>
+              <Events>
+                <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="expirationDateSpinnerStateChanged"/>
+              </Events>
               <AuxValues>
                 <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="18"/>
               </AuxValues>
@@ -343,7 +327,7 @@
                 <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="18"/>
               </AuxValues>
             </Component>
-            <Component class="javax.swing.JComboBox" name="statusLabel">
+            <Component class="javax.swing.JComboBox" name="statusComboBox">
               <Properties>
                 <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
                   <StringArray count="2">
@@ -353,7 +337,7 @@
                 </Property>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="statusLabelActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="statusComboBoxActionPerformed"/>
               </Events>
               <AuxValues>
                 <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>

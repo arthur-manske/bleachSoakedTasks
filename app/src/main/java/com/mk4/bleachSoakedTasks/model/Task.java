@@ -19,6 +19,7 @@ public class Task {
 
     public Task(String title, String description, Date expirationDate, Status status)
     {
+        this.id             = -1;
         this.title          = title;
         this.description    = description;
         this.status         = status;
